@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import type { Audition } from "./types";
 import { AuditionForm } from "./AuditionForm";
+import { AuditionList } from "./AuditionList";
 
 const STATUSES = ["upcoming", "submitted", "callback", "booked", "passed"];
 
@@ -47,24 +48,12 @@ function App() {
           )
         }
       />
-      <ul>
-        {auditions.map((a) => (
-          <li key={a.id}>
-            <strong>{a.project_title}</strong> - {a.role_name}
-            <select
-              value={a.status}
-              onChange={(e) => handleStatusChange(a.id, e.target.value)}
-            >
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>{" "}
-            <button onClick={() => handleDelete(a.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <AuditionList
+        auditions={auditions}
+        statuses={STATUSES}
+        onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
+      />
     </main>
   );
 }

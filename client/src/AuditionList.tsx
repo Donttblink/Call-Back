@@ -38,7 +38,9 @@ export function AuditionList({
               onChange={(e) => onStatusChange(a.id, e.target.value)}
             >
               {statuses.map((s) => (
-                <option key={s} value={s}></option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
             <button onClick={() => onDelete(a.id)}>Delete</button>
