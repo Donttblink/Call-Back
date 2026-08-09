@@ -55,6 +55,23 @@ app.delete("/api/auditions/:id", async (request, reply) => {
   return { deleted: result.rows[0].id };
 });
 
+app.patch("/api/auditions/:id", async (request, reply) => {
+  const { id } = request.params as { id: string };
+  const { status } = request.body as { status: string };
+
+  const result = await pool.query(
+    "UPDATE auditions SET status = $1 WHERE id = $2 RETURNING *",
+    [status, id],
+  );
+
+  if (result.rowCount === 0) {
+    reply.code(404);
+    return { error: "Audition not found" };
+  }
+
+  return result.rows[0];
+});
+
 app.listen({ port: 3000 }, (err) => {
   if (err) {
     app.log.error(err);
