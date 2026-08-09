@@ -34,26 +34,34 @@ export function AuditionForm({ onCreated }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="mb-6 flex gap-2">
       <input
+        className="flex-1 rounded-md border border-stone-300 p-2"
         placeholder="Project Title"
         value={projectTitle}
         onChange={(e) => setProjectTitle(e.target.value)}
         required
       />
       <input
+        className="flex-1 rounded-md border border-stone-300 p-2"
         placeholder="Role"
         value={roleName}
         onChange={(e) => setRoleName(e.target.value)}
         required
       />
       <input
+        className="flex-1 rounded-md border border-stone-300 p-2"
         placeholder="date"
         value={auditionDate}
         onChange={(e) => setAuditionDate(e.target.value)}
         required
       />
-      <button type="submit">Add audition</button>
+      <button
+        type="submit"
+        className="rounded-md bg-stone-800 px-4 py-2 text-white"
+      >
+        Add audition
+      </button>
     </form>
   );
 }

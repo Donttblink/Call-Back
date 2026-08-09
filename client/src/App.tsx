@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import type { Audition } from "./types";
 import { AuditionForm } from "./AuditionForm";
 import { AuditionList } from "./AuditionList";
@@ -37,8 +36,8 @@ function App() {
     setAuditions((prev) => prev.filter((a) => a.id !== id));
   }
   return (
-    <main>
-      <h1>Call-Back</h1>
+    <main className="mx-auto max-w-2x1 p-8">
+      <h1 className="mb-6 text-2x1 font-bold">Call-Back</h1>
       <AuditionForm
         onCreated={(a) =>
           setAuditions((prev) =>

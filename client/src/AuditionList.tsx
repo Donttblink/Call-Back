@@ -20,10 +20,13 @@ export function AuditionList({
   }
 
   return (
-    <ul className="audition-list">
+    <ul className="audition-list flex flex-col gap-3">
       {auditions.map((a) => (
-        <li key={a.id} className="audition-card">
-          <div className="audition-info">
+        <li
+          key={a.id}
+          className="audition-card flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow-sm"
+        >
+          <div className="audition-info flex flex-col">
             <strong>{a.project_title}</strong>
             <span>{a.role_name}</span>
             {a.audition_date && (
@@ -32,7 +35,7 @@ export function AuditionList({
               </span>
             )}
           </div>
-          <div className="audition-actions">
+          <div className="audition-actions flex items-center gap-2">
             <select
               value={a.status}
               onChange={(e) => onStatusChange(a.id, e.target.value)}
