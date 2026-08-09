@@ -36,8 +36,8 @@ function App() {
     setAuditions((prev) => prev.filter((a) => a.id !== id));
   }
   return (
-    <main className="mx-auto max-w-2x1 p-8">
-      <h1 className="mb-6 text-2x1 font-bold">Call-Back</h1>
+    <main className="mx-auto max-w-2xl p-8">
+      <h1 className="mb-6 text-2xl font-bold">Call-Back</h1>
       <AuditionForm
         onCreated={(a) =>
           setAuditions((prev) =>

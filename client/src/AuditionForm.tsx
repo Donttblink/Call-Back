@@ -50,11 +50,10 @@ export function AuditionForm({ onCreated }: Props) {
         required
       />
       <input
-        className="flex-1 rounded-md border border-stone-300 p-2"
-        placeholder="date"
+        className="rounded-md border border-stone-300 p-2"
+        type="date"
         value={auditionDate}
         onChange={(e) => setAuditionDate(e.target.value)}
-        required
       />
       <button
         type="submit"
