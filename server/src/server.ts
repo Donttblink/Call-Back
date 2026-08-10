@@ -75,7 +75,7 @@ app.patch("/api/auditions/:id", async (request, reply) => {
 app.get("/api/auditions/:id/lines", async (request) => {
   const { id } = request.params as { id: string };
   const result = await pool.query(
-    "SELECT * FROM script_lines WHERE audition_id = $1 ODER BY position",
+    "SELECT * FROM script_lines WHERE audition_id = $1 ORDER BY position",
     [id],
   );
   return result.rows;
