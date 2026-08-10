@@ -80,6 +80,7 @@ app.get("/api/auditions/:id/lines", async (request) => {
   );
   return result.rows;
 });
+
 app.post("/api/auditions/:id/lines", async (request, reply) => {
   const { id } = request.params as { id: string };
   const body = request.body as {
@@ -108,6 +109,21 @@ app.post("/api/auditions/:id/lines", async (request, reply) => {
 
   reply.code(201);
   return result.rows[0];
+});
+
+app.delete("/api/lines/:id", async (request, reply) => {
+  const { id } = request.params as { id: string };
+
+  const result = await pool.query(
+    "DELETE FROM script_lines WHERE id = $1 RETURNING id",
+    [id],
+  );
+
+  if (result.rowCount === 0) {
+    reply.code(404);
+    return { error: "Line not found" };
+  }
+  return { deleted: result.rows[0].id };
 });
 
 app.listen({ port: 3000 }, (err) => {

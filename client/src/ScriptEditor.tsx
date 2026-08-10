@@ -42,13 +42,24 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
     setContent("");
   }
 
+  async function handleDelete(id: number) {
+    const res = await fetch(`/api/lines/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      console.error("Failed to delete:", await res.text());
+      return;
+    }
+    setLines((prev) => prev.filter((line) => line.id !== id));
+  }
+
   return (
     <section className="mt-8 rounded-lg bg-white p-6 shadow-sm">
       <h2 className="mb-4 text-lg font-bold">Script</h2>
 
       <div className="mb-6 font-mono text-sm">
         {lines.map((line) => (
-          <div key={line.id} className="mb-2">
+          <div key={line.id} className="mb-2 flex item-center gap-2">
             {line.element_type === "scene_heading" && (
               <p className="font-bold uppercase">{line.content}</p>
             )}
@@ -61,6 +72,12 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
                 <p>{line.content}</p>
               </div>
             )}
+            <button
+              className="text-sm text-red-600 hover:underline cursor-pointer"
+              onClick={() => handleDelete(line.id)}
+            >
+              x
+            </button>
           </div>
         ))}
       </div>
