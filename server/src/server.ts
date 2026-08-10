@@ -72,6 +72,10 @@ app.patch("/api/auditions/:id", async (request, reply) => {
   return result.rows[0];
 });
 
+app.get("/api/auditions/:id/lines", async (request) => {
+  const { id } = request.params as { id: string };
+  const result = await pool.query("SELECT * FROM script_lines ");
+});
 app.listen({ port: 3000 }, (err) => {
   if (err) {
     app.log.error(err);
