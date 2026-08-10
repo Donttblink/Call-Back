@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Audition } from "./types";
 import { AuditionForm } from "./AuditionForm";
 import { AuditionList } from "./AuditionList";
+import { ScriptEditor } from "./ScriptEditor";
 
 const STATUSES = ["upcoming", "submitted", "callback", "booked", "passed"];
 
@@ -9,6 +10,7 @@ function App() {
   const [auditions, setAuditions] = useState<Audition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -45,6 +47,7 @@ function App() {
       return;
     }
     setAuditions((prev) => prev.filter((a) => a.id !== id));
+    if (selectedId === id) setSelectedId(null);
   }
   return (
     <main className="mx-auto max-w-2xl p-8">
@@ -66,10 +69,14 @@ function App() {
         <AuditionList
           auditions={auditions}
           statuses={STATUSES}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
         />
       )}
+      {selectedId && <ScriptEditor auditionId={selectedId} />}
+      {}
     </main>
   );
 }
