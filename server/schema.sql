@@ -11,7 +11,7 @@ CREATE TABLE auditions (
 
 CREATE TABLE script_lines (
   id             SERIAL PRIMARY KEY,
-  auditions_id   INTEGER NOT NULL REFERENCES auditions(id) ON DELETE CASCADE,
+  audition_id   INTEGER NOT NULL REFERENCES auditions(id) ON DELETE CASCADE,
   position       INTEGER NOT NULL,
   element_type   TEXT NOT NULL CHECK (element_type IN ('scene_heading', 'action', 'dialogue' )),
   character_name TEXT,
