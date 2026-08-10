@@ -7,11 +7,22 @@ const STATUSES = ["upcoming", "submitted", "callback", "booked", "passed"];
 
 function App() {
   const [auditions, setAuditions] = useState<Audition[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/auditions")
-      .then((res) => res.json())
-      .then(setAuditions);
+    async function load() {
+      try {
+        const res = await fetch("/api/auditions");
+        if (!res.ok) throw new Error(`Server responded ${res.status}`);
+        setAuditions(await res.json());
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, []);
 
   async function handleStatusChange(id: number, status: string) {
@@ -47,12 +58,18 @@ function App() {
           )
         }
       />
-      <AuditionList
-        auditions={auditions}
-        statuses={STATUSES}
-        onDelete={handleDelete}
-        onStatusChange={handleStatusChange}
-      />
+      {loading ? (
+        <p className="text-center text-stone-500">Loading...</p>
+      ) : error ? (
+        <p className="text-center text-red-600">{error}</p>
+      ) : (
+        <AuditionList
+          auditions={auditions}
+          statuses={STATUSES}
+          onDelete={handleDelete}
+          onStatusChange={handleStatusChange}
+        />
+      )}
     </main>
   );
 }
