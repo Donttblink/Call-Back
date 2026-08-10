@@ -74,8 +74,42 @@ app.patch("/api/auditions/:id", async (request, reply) => {
 
 app.get("/api/auditions/:id/lines", async (request) => {
   const { id } = request.params as { id: string };
-  const result = await pool.query("SELECT * FROM script_lines ");
+  const result = await pool.query(
+    "SELECT * FROM script_lines WHERE audition_id = $1 ODER BY position",
+    [id],
+  );
+  return result.rows;
 });
+app.post("/api/auditions/:id/lines", async (request, reply) => {
+  const { id } = request.params as { id: string };
+  const body = request.body as {
+    element_type: string;
+    character_name?: string;
+    is_mine?: boolean;
+    content: string;
+  };
+
+  const result = await pool.query(
+    `INSERT INTO script_lines (audition_id, position, element_type, character_name, is_mine, content)
+    VALUES (
+    $1,
+    COALESCE((SELECT MAX(position) FROM script_lines WHERE audition_id = $1), 0) + 1,
+    $2, $3, $4, $5
+  )
+    RETURNING *`,
+    [
+      id,
+      body.element_type,
+      body.character_name ?? null,
+      body.is_mine ?? false,
+      body.content,
+    ],
+  );
+
+  reply.code(201);
+  return result.rows[0];
+});
+
 app.listen({ port: 3000 }, (err) => {
   if (err) {
     app.log.error(err);
