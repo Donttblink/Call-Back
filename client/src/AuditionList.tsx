@@ -1,5 +1,13 @@
 import type { Audition } from "./types";
 
+const STATUS_STYLES: Record<string, string> = {
+  upcoming: "bg-amber-100 text-amber-800",
+  submitted: "bg-blue-100 text-blue-800",
+  callback: "bg-purple-100 text-purple-800",
+  booked: "bg-green-100 text-green-800",
+  passed: "bg-stone-200 text-stone-600",
+};
+
 type Props = {
   auditions: Audition[];
   statuses: string[];
@@ -39,6 +47,7 @@ export function AuditionList({
             <select
               value={a.status}
               onChange={(e) => onStatusChange(a.id, e.target.value)}
+              className={`round-full px-3 py-1 text-sm font-medium ${STATUS_STYLES[a.status] ?? ""}`}
             >
               {statuses.map((s) => (
                 <option key={s} value={s}>
