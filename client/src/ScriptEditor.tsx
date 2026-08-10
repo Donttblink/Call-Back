@@ -10,9 +10,15 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    fetch(`/api/auditions/${auditionId}/lines`)
-      .then((res) => res.json())
-      .then(setLines);
+    async function loadLines() {
+      const res = await fetch(`/api/auditions/${auditionId}/lines`);
+      if (!res.ok) {
+        console.error("Failed to load lines:", await res.text());
+        return;
+      }
+      setLines(await res.json());
+    }
+    loadLines();
   }, [auditionId]);
 
   async function handleSubmit(e: SubmitEvent) {
