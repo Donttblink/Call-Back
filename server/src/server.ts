@@ -1,12 +1,14 @@
 import { pool } from "./db.js";
-import Fastify, { fastify } from "fastify";
+import Fastify from "fastify";
 
-const app = fastify({ logger: true });
+const app = Fastify({ logger: true });
 
+// Health---------------------------------------------------------------------------------------
 app.get("/health", async () => {
   return { status: "ok" };
 });
 
+// Auditions------------------------------------------------------------------------------------
 app.get("/api/auditions", async () => {
   const result = await pool.query(
     "SELECT * FROM auditions ORDER BY audition_date",
@@ -40,21 +42,6 @@ app.post("/api/auditions", async (request, reply) => {
   return result.rows[0];
 });
 
-app.delete("/api/auditions/:id", async (request, reply) => {
-  const { id } = request.params as { id: string };
-
-  const result = await pool.query(
-    "DELETE FROM auditions WHERE id = $1 RETURNING id",
-    [id],
-  );
-
-  if (result.rowCount === 0) {
-    reply.code(404);
-    return { error: "Audition not found" };
-  }
-  return { deleted: result.rows[0].id };
-});
-
 app.patch("/api/auditions/:id", async (request, reply) => {
   const { id } = request.params as { id: string };
   const { status } = request.body as { status: string };
@@ -72,6 +59,22 @@ app.patch("/api/auditions/:id", async (request, reply) => {
   return result.rows[0];
 });
 
+app.delete("/api/auditions/:id", async (request, reply) => {
+  const { id } = request.params as { id: string };
+
+  const result = await pool.query(
+    "DELETE FROM auditions WHERE id = $1 RETURNING id",
+    [id],
+  );
+
+  if (result.rowCount === 0) {
+    reply.code(404);
+    return { error: "Audition not found" };
+  }
+  return { deleted: result.rows[0].id };
+});
+
+// Script Lines -----------------------------------------------------------------------------------
 app.get("/api/auditions/:id/lines", async (request) => {
   const { id } = request.params as { id: string };
   const result = await pool.query(
@@ -108,6 +111,36 @@ app.post("/api/auditions/:id/lines", async (request, reply) => {
   );
 
   reply.code(201);
+  return result.rows[0];
+});
+
+app.patch("/api/lines/:id", async (request, reply) => {
+  const { id } = request.params as { id: string };
+  const body = request.body as {
+    character_name?: string;
+    content?: string;
+    is_mine?: boolean;
+  };
+
+  const result = await pool.query(
+    `UPDATE script_lines 
+    SET  character_name = COALESCE($1, character_name),
+         content = COALESCE($2, content), 
+         is_mine = COALESCE($3, is_mine)
+    WHERE id = $4 
+    RETURNING *`,
+    [
+      body.character_name ?? null,
+      body.content ?? null,
+      body.is_mine ?? null,
+      id,
+    ],
+  );
+
+  if (result.rowCount === 0) {
+    reply.code(404);
+    return { error: "Line not found" };
+  }
   return result.rows[0];
 });
 
