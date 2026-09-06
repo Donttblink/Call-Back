@@ -40,6 +40,7 @@ function App() {
     const updated: Audition = await res.json();
     setAuditions((prev) => prev.map((a) => (a.id === id ? updated : a)));
   }
+
   async function handleDelete(id: number) {
     const res = await fetch(`/api/auditions/${id}`, { method: "DELETE" });
     if (!res.ok) {

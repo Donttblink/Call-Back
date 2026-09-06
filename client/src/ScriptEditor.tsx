@@ -53,6 +53,20 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
     setLines((prev) => prev.filter((line) => line.id !== id));
   }
 
+  async function handleToggleMine(line: ScriptLine) {
+    const res = await fetch(`/api/lines/${line.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_mine: !line.is_mine }),
+    });
+    if (!res.ok) {
+      console.error("Failed to update line:", await res.text());
+      return;
+    }
+    const updated: ScriptLine = await res.json();
+    setLines((prev) => prev.map((l) => (l.id === line.id ? updated : l)));
+  }
+
   return (
     <section className="mt-8 rounded-lg bg-white p-6 shadow-sm">
       <h2 className="mb-4 text-lg font-bold">Script</h2>
@@ -66,7 +80,9 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
             {line.element_type === "action" && <p>{line.content}</p>}
             {line.element_type === "dialogue" && (
               <div
-                className={`mx-auto max-w-xs rounded px-2 py-1 text-center ${line.is_mine ? "bg-yellow-100" : ""}`}
+                onClick={() => handleToggleMine(line)}
+                title="Click to toggle whose line this is"
+                className={`mx-auto max-w-xs rounded px-2 py-1 text-center cursor-pointer ${line.is_mine ? "bg-yellow-100" : ""}`}
               >
                 <p className="uppercase">{line.character_name}</p>
                 <p>{line.content}</p>
