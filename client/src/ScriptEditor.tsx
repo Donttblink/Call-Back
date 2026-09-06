@@ -73,7 +73,7 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
 
       <div className="mb-6 font-mono text-sm">
         {lines.map((line) => (
-          <div key={line.id} className="mb-2 flex item-center gap-2">
+          <div key={line.id} className="mb-2 flex items-center gap-2">
             {line.element_type === "scene_heading" && (
               <p className="font-bold uppercase">{line.content}</p>
             )}
