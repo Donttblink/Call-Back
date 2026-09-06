@@ -8,6 +8,8 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
   const [characterName, setCharacterName] = useState("");
   const [isMine, setIsMine] = useState(false);
   const [content, setContent] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [draftContent, setDraftContent] = useState("");
 
   useEffect(() => {
     async function loadLines() {
@@ -65,6 +67,15 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
     }
     const updated: ScriptLine = await res.json();
     setLines((prev) => prev.map((l) => (l.id === line.id ? updated : l)));
+  }
+
+  function startEdit(line: ScriptLine) {
+    setEditingId(line.id);
+    setDraftContent(line.content);
+  }
+
+  function cancelEdit(line: ScriptLine) {
+    setEditingId(null);
   }
 
   return (
