@@ -22,3 +22,5 @@
   **Optimistic updates**: all mutations currently wait for server round-trip. Revisit when app feels laggy on real networks / phone.
   **URL routing**: selection (audition id) should line in the URL. Add with React Router when second screen (practice view) exists.
   **Mobile/native**: target is iPhone. Original app wraps React via Capacitor, default plan is the same path. Implications now: touch-first grammar (no hover/double-click dependence for core actions), 44pt tap targets, APU treated as a future versioned contract. Edit-mode needs a tap path (tap-select + button, or long-press) before mobile ship.
+  **Activity events / gamification**: append-only `activity_events` table (event_type, entity_id, metadata JSONB, created_at). Kafka-at-home: producers = routes emitting on meaningful actions; dashboard tiles = parameterized queries filtered by event_type. ONE-WAY CLOCK: events can't be backfilled — start emitting the moment the rehearsal/play feature exists, even with no UI reading them. Dashboard (Apple-Watch-style tiles/rings) built later, config-driven.
+  Event naming: noun.verb_past ('rehearsal.completed', 'audition.status_changed').
