@@ -130,11 +130,25 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
                 {line.element_type === "action" && <p>{line.content}</p>}
                 {line.element_type === "dialogue" && (
                   <div
-                    onClick={() => handleToggleMine(line)}
-                    title="Click to toggle whose line this is"
-                    className={`mx-auto max-w-xs rounded px-2 py-1 text-center cursor-pointer ${line.is_mine ? "bg-yellow-100" : ""}`}
+                    className={`mx-auto max-w-xs rounded px-2 py-1 text-center ${line.is_mine ? "bg-yellow-100" : ""}`}
                   >
-                    <p className="uppercase">{line.character_name}</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <p className="uppercase">{line.character_name}</p>
+                      <button
+                        type="button"
+                        title="Click to toggle whose line this is"
+                        onClick={() => handleToggleMine(line)}
+                        onDoubleClick={(e) => e.stopPropagation()}
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${
+                          line.is_mine
+                            ? "bg-orange-300 text-orange-700"
+                            : "bg-stone-200 text-stone-600"
+                        }`}
+                      >
+                        {line.is_mine ? "MINE" : "READER"}
+                      </button>
+                    </div>
+
                     <p>{line.content}</p>
                   </div>
                 )}
