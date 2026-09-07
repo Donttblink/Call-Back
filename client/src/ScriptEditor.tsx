@@ -74,7 +74,24 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
     setDraftContent(line.content);
   }
 
-  function cancelEdit(line: ScriptLine) {
+  function cancelEdit() {
+    setEditingId(null);
+  }
+
+  async function handleEditSave(line: ScriptLine) {
+    const res = await fetch(`/api/lines/${line.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: draftContent,
+      }),
+    });
+    if (!res.ok) {
+      console.error("Failed to save edit:", await res.text());
+      return;
+    }
+    const edited: ScriptLine = await res.json();
+    setLines((prev) => prev.map((l) => (l.id === line.id ? edited : l)));
     setEditingId(null);
   }
 
@@ -84,20 +101,44 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
 
       <div className="mb-6 font-mono text-sm">
         {lines.map((line) => (
-          <div key={line.id} className="mb-2 flex items-center gap-2">
-            {line.element_type === "scene_heading" && (
-              <p className="font-bold uppercase">{line.content}</p>
-            )}
-            {line.element_type === "action" && <p>{line.content}</p>}
-            {line.element_type === "dialogue" && (
-              <div
-                onClick={() => handleToggleMine(line)}
-                title="Click to toggle whose line this is"
-                className={`mx-auto max-w-xs rounded px-2 py-1 text-center cursor-pointer ${line.is_mine ? "bg-yellow-100" : ""}`}
-              >
-                <p className="uppercase">{line.character_name}</p>
-                <p>{line.content}</p>
-              </div>
+          <div
+            key={line.id}
+            onDoubleClick={() => startEdit(line)}
+            className="mb-2 flex items-center gap-2"
+          >
+            {line.id === editingId ? (
+              <textarea
+                autoFocus
+                value={draftContent}
+                onChange={(e) => setDraftContent(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleEditSave(line);
+                  }
+                  if (e.key === "Escape") {
+                    cancelEdit();
+                  }
+                }}
+                className="w-full rounded-md border border-stone-300 p-2"
+              />
+            ) : (
+              <>
+                {line.element_type === "scene_heading" && (
+                  <p className="font-bold uppercase">{line.content}</p>
+                )}
+                {line.element_type === "action" && <p>{line.content}</p>}
+                {line.element_type === "dialogue" && (
+                  <div
+                    onClick={() => handleToggleMine(line)}
+                    title="Click to toggle whose line this is"
+                    className={`mx-auto max-w-xs rounded px-2 py-1 text-center cursor-pointer ${line.is_mine ? "bg-yellow-100" : ""}`}
+                  >
+                    <p className="uppercase">{line.character_name}</p>
+                    <p>{line.content}</p>
+                  </div>
+                )}
+              </>
             )}
             <button
               className="text-sm text-red-600 hover:underline cursor-pointer"
