@@ -10,6 +10,7 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
   const [content, setContent] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [draftContent, setDraftContent] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     async function loadLines() {
@@ -70,11 +71,17 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
   }
 
   function startEdit(line: ScriptLine) {
+    if (!isEditing) return;
     setEditingId(line.id);
     setDraftContent(line.content);
   }
 
   function cancelEdit() {
+    setEditingId(null);
+  }
+
+  function toggleEditMode() {
+    setIsEditing((prev) => !prev);
     setEditingId(null);
   }
 
@@ -97,7 +104,14 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
 
   return (
     <section className="mt-8 rounded-lg bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-bold">Script</h2>
+      <h2 className="flex justify-between mb-4 text-lg font-bold">Script</h2>
+      <button
+        type="submit"
+        className="self-start rounded-md bg-stone-800 px-4 py-2 text-white"
+        onClick={toggleEditMode}
+      >
+        {!isEditing ? "Edit" : "Done"}
+      </button>
 
       <div className="mb-6 font-mono text-sm">
         {lines.map((line) => (
@@ -134,19 +148,21 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
                   >
                     <div className="flex items-center justify-center gap-2">
                       <p className="uppercase">{line.character_name}</p>
-                      <button
-                        type="button"
-                        title="Click to toggle whose line this is"
-                        onClick={() => handleToggleMine(line)}
-                        onDoubleClick={(e) => e.stopPropagation()}
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${
-                          line.is_mine
-                            ? "bg-orange-300 text-orange-700"
-                            : "bg-stone-200 text-stone-600"
-                        }`}
-                      >
-                        {line.is_mine ? "MINE" : "READER"}
-                      </button>
+                      {isEditing && (
+                        <button
+                          type="button"
+                          title="Click to toggle whose line this is"
+                          onClick={() => handleToggleMine(line)}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${
+                            line.is_mine
+                              ? "bg-orange-300 text-orange-700"
+                              : "bg-stone-200 text-stone-600"
+                          }`}
+                        >
+                          {line.is_mine ? "MINE" : "READER"}
+                        </button>
+                      )}
                     </div>
 
                     <p>{line.content}</p>
@@ -154,63 +170,67 @@ export function ScriptEditor({ auditionId }: { auditionId: number }) {
                 )}
               </>
             )}
-            <button
-              className="text-sm text-red-600 hover:underline cursor-pointer"
-              onClick={() => handleDelete(line.id)}
-            >
-              x
-            </button>
+            {isEditing && (
+              <button
+                className="text-sm text-red-600 hover:underline cursor-pointer"
+                onClick={() => handleDelete(line.id)}
+              >
+                x
+              </button>
+            )}
           </div>
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <select
-            value={elementType}
-            onChange={(e) =>
-              setElementType(e.target.value as ScriptLine["element_type"])
-            }
-            className="rounded-md border border-stone-300 p-2"
-          >
-            <option value="scene_heading">Scene heading</option>
-            <option value="action">Action</option>
-            <option value="dialogue">Dialogue</option>
-          </select>
-          {elementType === "dialogue" && (
-            <>
-              <input
-                className="flex-1 rounded-md border border-stone-300 p-2"
-                placeholder="Character name"
-                value={characterName}
-                onChange={(e) => setCharacterName(e.target.value)}
-                required
-              />
-              <label className="flex items-center gap-1 text-sm">
+      {isEditing && (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <select
+              value={elementType}
+              onChange={(e) =>
+                setElementType(e.target.value as ScriptLine["element_type"])
+              }
+              className="rounded-md border border-stone-300 p-2"
+            >
+              <option value="scene_heading">Scene heading</option>
+              <option value="action">Action</option>
+              <option value="dialogue">Dialogue</option>
+            </select>
+            {elementType === "dialogue" && (
+              <>
                 <input
-                  type="checkbox"
-                  checked={isMine}
-                  onChange={(e) => setIsMine(e.target.checked)}
+                  className="flex-1 rounded-md border border-stone-300 p-2"
+                  placeholder="Character name"
+                  value={characterName}
+                  onChange={(e) => setCharacterName(e.target.value)}
+                  required
                 />
-                My Line
-              </label>
-            </>
-          )}
-        </div>
-        <textarea
-          className="rounded-md border border-stone-300 p-2"
-          placeholder="Line content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-        />
-        <button
-          type="submit"
-          className="self-start rounded-md bg-stone-800 px-4 py-2 text-white"
-        >
-          Add line
-        </button>
-      </form>
+                <label className="flex items-center gap-1 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={isMine}
+                    onChange={(e) => setIsMine(e.target.checked)}
+                  />
+                  My Line
+                </label>
+              </>
+            )}
+          </div>
+          <textarea
+            className="rounded-md border border-stone-300 p-2"
+            placeholder="Line content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            required
+          />
+          <button
+            type="submit"
+            className="self-start rounded-md bg-stone-800 px-4 py-2 text-white"
+          >
+            Add line
+          </button>
+        </form>
+      )}
     </section>
   );
 }
